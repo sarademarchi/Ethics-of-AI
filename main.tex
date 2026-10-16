@@ -1,0 +1,338 @@
+\documentclass[a4paper]{article}
+
+% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+
+% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=black]{hyperref}
+\usepackage{parskip}
+\usepackage{float}
+
+\usepackage{booktabs}
+\usepackage{amssymb} 
+
+% APA-style references
+\usepackage{csquotes}
+\usepackage[style=apa,backend=biber,natbib=true]{biblatex}
+\addbibresource{sample.bib}
+
+
+\newcommand{\ganttbar}{\rule{1.2em}{0.7ex}}
+\newcommand{\milestone}{\raisebox{0.1ex}{\ensuremath{\blacklozenge}}}
+
+\begin{document}
+\thispagestyle{empty}
+
+\vspace*{\fill}
+\begin{center}
+
+{\Huge\bfseries Featback Meets AI\par}
+
+\vspace{0.8em}
+{\LARGE Assignment Phase 2 -- Group EADS G\par}
+
+\vspace{1.5em}
+{\large Sara De Marchi (s.de.marchi@student.tue.nl),\\
+Seeam Amini (s.amini@student.tue.nl),\\
+Ritik Ghanshani (r.s.ghanshani@student.tue.nl),\\
+Nikhil Kamath (n.s.kamath@student.tue.nl).\par}
+
+\today
+\end{center}
+\vspace*{\fill}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Public Summary} % Max 150 words, simple language.
+% Questions addressed and tool created; importance for stakeholders/public; expected challenges.
+Many young people with eating-disorder symptoms wait years before getting help. Featback is a free, anonymous online program that sends a weekly feedback message after users answer a short questionnaire of four questions. Each message comes from a fixed bank of pre-approved messages, so it often misses what the person actually experienced. Many users also stop using the program early. 
+
+This project asks whether AI can make these messages more personal while keeping them safe for the people dealing with these disorders. Our mock-up adds an optional fifth open question and lets AI write the personal part of the feedback message using the input of the user, while the expert-written advice stays as it is. In addition to that, any sign of serious danger, such as self-harm, triggers a fixed message pointing to professional help.
+
+A suited message may help users feel heard, stay longer and reach care sooner, which also eases waiting lists. The main challenges are spotting danger reliably, fairness to people who write little, privacy, and knowing whether personalization helps.
+
+\newpage
+
+\section{Comprehensive Summary} % Max 2000 words in total.
+
+\subsection{Problem Definition and Objectives} 
+% The problem, the change we want to achieve, and whose problem it is.
+Featback is a low-threshold program that reaches people with eating-disorder symptoms before they enter care. According to the client, its main goal is awareness and help-seeking, followed by symptoms reduction. 
+
+The weekly message is chosen from about 1,250 pre-written messages, based on four questions with four answer options each, which gives 256 combinations \citep{rohrbach2022featback}. Two kinds of information never reach the message: change inside one answer option (three binge days one week and one the next both read ``1--3 days''), and anything the questions do not ask about, such as a stressful exam week. The client finds the message too rigid and names retention as the central weakness of the program, since many visitors try Featback and do not stay.
+
+Three groups share this problem. Users are young, anonymous people with symptoms and no treatment. A message that doesn't take into consideration their experience makes it harder to feel heard, which the client treats as the main quality measure and a reason to come back. The client and its clinicians aim to having users stay long enough to reach the help-seeking stage. The care system gains when people who would otherwise stay undetected are reached early, and the client named relief of waiting lists as an explicit goal.
+
+The delay in reaching care is long. In help-seeking samples, the average duration of untreated eating disorder is 29.9 months for anorexia nervosa, 53.0 for bulimia nervosa and 67.4 for binge eating disorder, and preliminary evidence suggests that shortening it can improve outcomes \citep{austin2021duration}. In the Netherlands, it often takes more than four years to seek treatment \citep{rohrbach2019protocol}, which matches what the client told us. A tool that keeps users engaged early works on a gap with a measurable length.
+
+The change we want is a weekly message that reflects what the user reported and is safe to send without clinician review. Our objectives are to:
+\begin{enumerate}
+  \item personalize the two personal components of the message, a summary that opens
+  with one line of empathy and reflects what the user reported, and a short
+  encouraging closing, using the four closed answers, the optional fifth
+  question and, where the data allow, how the week compares with earlier
+  weeks;
+  \item keep the psychoeducation and the tips as expert-written, pre-approved text from the message bank;
+  \item handle acute-risk input without AI generation, so that the user
+  receives a fixed reply directing them to their GP or other professional
+  help;
+  \item tell users that AI is involved in writing the message and keep the fifth
+  question optional, with consent given once and withdrawable; 
+  \item build and evaluate a mock-up on synthetic data, scoring structure,
+  tone, tip fit and safety, and checking the design against the Belmont
+  principles of respect for persons, beneficence and justice.
+\end{enumerate}
+We define personalization as tailoring the message to the individual's own symptoms and stated experience, and retention as the number of weekly check-ins a user completes during the eight-week program (0--8), which is how the Featback trials measure intervention usage \citep{rohrbach2019protocol}. The mock-up can show that the pipeline works on synthetic inputs and how its safety layers behave (see Section \ref{subsection 2.3}). It is not clinically validated, and it can't show that personalization improves retention, which requires a trial with real users, so we treat that benefit as a hypothesis.
+
+\subsection{Background: Current Approaches and Knowledge} 
+
+In a randomized trial with 355 participants, 43\% of whom had never received eating-disorder treatment, Featback, expert-patient chat or email support, and their combination all reduced symptoms more than a waiting list, with no difference among the three approaches \citep{rohrbach2022featback}. Automation alone matched human support on symptoms but scored lower on satisfaction (5.8 out of 10, against 7.1 and 7.4 with expert-patient support). In the trial, 84.1\% of Featback-only participants completed at least five of eight weekly check-ins, while the client reports that many visitors to the public website do not stay. According to the trial protocol, a pre-defined algorithm generates the message from the four items (weight and shape concerns, nutrition and dieting, binge eating, compensatory behaviors), using whether each is in the healthy or unhealthy range and whether it improved, deteriorated or stayed unchanged \citep{rohrbach2019protocol}. Featback is therefore already tailored at the level of these categories; our work goes further by using what the user writes.
+
+Personalization is widely assumed to drive engagement, but \citet{hornstein2023personalization} found only two direct comparisons of personalized and generic versions among 138 studies, with mixed results, and \citet{matthews2025personalisation} reach a similar conclusion for mental health apps. For the open question, \citet{arditi2020computer} found that free-text comments in a cancer patient survey held personal and emotional themes that the closed questions missed.
+
+\citet{fardouly2022ml} review machine learning in the field, including text-based chatbots for psychoeducation and coping skills. One chatbot-delivered prevention program reduced weight and shape concerns over six months compared with a waiting list, and the authors call for more work on how chatbots respond to specific and unanticipated input. They also warn that most models were built on data from young white women and may not generalize. \citet{monaco2024advanced} propose a regional platform in Italy with risk prediction and a patient chatbot, but report no outcome data yet.
+
+Featback's existing safety handling is rule-based: in the trial, a BMI of 15 or lower, or compensatory behavior or bingeing every day for a week, triggered an alarm to the researcher and an e-mail recommending professional help, and expert patients referred suicidal ideation to Stichting 113, a 24-hour Dutch suicide prevention service \citep{rohrbach2019protocol}. These rules relied on closed answers and a researcher who received the alarm. Our design assumes no reviewer: nobody at Featback is notified, in line with the client's suggestion to point users to help only. The open fifth question also adds free text that numeric thresholds cannot read, so a word-list check and an AI check run before any message is written (Section \ref{subsection 2.3}).
+
+General-purpose chatbots handle risk poorly. \citet{heston2023safety} found that mental health chatbots delayed referral to a human to potentially dangerous levels, and 22 of 25 resumed ordinary dialogue once the simulated risk dropped. \citet{clark2025ability} found that AI therapy and companion bots endorsed harmful proposals from distressed fictional adolescents in 19 of 60 opportunities, and \citet{lawrence2024opportunities} describe such failures as a structural risk of applying large language models to mental health. \citet{BOLPAGNI2026101043} ground safer chatbot design in triage and stepped care, which match the intensity of the response to the level of risk. These findings underlie two design choices: acute input never reaches the writing model, and generation is confined to the personal parts of the message.
+
+Taken together, and beyond rule-based tailoring such as Featback's own, we found no study that tests AI-written, personalized feedback in an anonymous, low-threshold self-help program for eating disorders where expert-written content stays at the core and no clinician reviews the output. This is the gap our mock-up addresses.
+
+\subsection{Plan of Approach and Design Strategy} \label{subsection 2.3}
+
+Our plan changes one moment in Featback's week, the making of the message. Today a message is picked from the bank of about 1,250 and sent as it is. In our design it is still picked from the bank, and then its personal parts are written around it, so the piece that describes the user's own week responds to the week the user actually reported. The route to impact runs through that experience: users feel answered, they stay with the weekly cadence, and the program carries them further toward help; for the client, this is retention in a tool whose only job is to keep people engaged long enough for it to work. We design against the Belmont principles, respect for persons, beneficence, and justice, using Design for Values as our method, so every choice below answers to a named value.
+
+The week is handled in four moves, and the first is safety. A pass on the fifth question runs before the model is asked to do anything, in two layers. The first checks the text against patterns for acute and sensitive wording and for staying on topic, in English and Dutch; its acute patterns follow the categories of the Columbia Suicide Severity Rating Scale and use the wording of its validated Dutch version. If it says acute, the process stops and the text never reaches the model. Otherwise the text goes to an AI check that answers with exactly one word, acute, sensitive, off-topic or routine, and cannot write a message. Either layer alone can stop a message: when they disagree, the more serious answer wins, and if the AI check fails, the word list stands. This is triage and stepped care in miniature: risk first, then a response matched to it. For an acute answer nothing is generated: the user gets a fixed message pointing to 113 (free, day and night), the Proud2Bme chat and the Eetstoornissennetwerk care finder, all checked against the services' websites in September; it notes that the other answers were saved, and no one at Featback is notified, since the client suggested pointing to help only. Sensitive answers currently receive the regular message.
+
+Second, selection. The selector embeds the bank once, offline, and each week embeds the week's answers and returns the message closest to it; numbers are turned into words first (binges on 1 to 3 days, and improving), because a raw day count carries no meaning into an embedding. The answers pass a filter first and the embeddings choose inside the filtered set, because similarity is not the same thing as clinical relevance. Selection needs no language model, costs one encoder call per week, and is deterministic. The first Phase 1 design landed here: alone, it can only re-rank existing messages, and could never act on the fifth question; as a stage, it holds the clinical content steady.
+
+Third, the writer. Where a week reaches writing, the fine-tuned model produces the two personal components around the base message: a summary that opens with one line of empathy and then echoes back what the user reported in the severity words of the questions, and a short closing that encourages without giving new advice. Nothing clinical is written; the psychoeducation and the tips arrive with the selected message. Off-topic weeks get one boundary line instead.
+
+Fourth, the post-check. Before anything sends, it verifies the message's structure, its tone, and the absence of diagnostic language. It is deliberately narrow, which we return to in the challenges.
+
+Each choice has a reason. The bank stays because the psychoeducation and the tips should remain expert-written and pre-approved. The fine-tune is needed because the tone must match Featback's existing messages reliably. It runs small and local because the proof of concept has to run on student resources and nothing in it should require real user data to move anywhere. Every message states that AI was involved in writing it, and the fifth question is optional, with consent given once and withdrawable.
+
+The mock-up runs entirely on synthetic material, built to carry the structure of the real system. The core data set is one pair for each of the 256 answer combinations of the four questions, split into 231 pairs for training and 25 held out that never enter training. A pair's input is the week's answers written out in words, using the severity labels of the questions, plus the base message that the selector picked for that week; its expected output is only the two personal components, the summary with its empathy line and severity echo, and the closing. The fine-tune is a small open model (Qwen3.5-4B) trained with a LoRA adapter for 120 steps, which takes about ten minutes on one consumer GPU. On the 25 held-out combinations we check two things mechanically: whether the model echoes the severity wording the user reported, and whether it stops where the message ends. The fine-tuned model did both in all 25 cases; the untuned base model managed 4 of 25 on severity wording and ran on in every case. The bank holds the expert content, the psychoeducation and the tips; the client reviews it for equivalence in structure and tone, our stand-in for the real bank she did not share.
+
+The evaluation has four parts. The safety pass is tested at the sentence level on 220 items written by AI agents that never saw the code. The word list, built from the first set of 34 crisis sentences, caught 32; on a fresh set of 35 it caught 9, so the AI check carries most of the load. That check caught all 34 of the first set, with 8 false alarms among 71 ordinary sentences, and the fresh set has not been run against it yet, because its prompt was built on the first. The selector has a held-out check of its own, against weeks whose correct message is known. Then the full pipeline runs ten synthetic weekly check-ins covering all four tracks, and the resulting messages go to the client and clinicians, who score each on structure, tone, tip fit and safety, from 0 to 10, target average 8. Passing means: four components present, no diagnosis, tone matching the example message, tip fitting what was reported, and acute input answered from the approved resource set. The mock-up shows the pipeline works on synthetic inputs; it is not clinically validated, the training material is ours rather than the client's, and it does not replace professional judgment.
+
+Reaching the impact asks specific actions from the people around the project. The client confirms the synthetic material is a fair stand-in and later supplies the real bank; the clinicians approve the acute reply wording and score the mock-up's outputs; the users answer honestly, week after week, with the fifth question available and removable. Three challenges stay open. The first is detection. The word list does not generalize to new phrasings (9 of 35 fresh crisis sentences), so the AI check carries most of the load, and that check was tuned and tested on the same set it is later judged against. Its 8-in-71 false alarms show that a past low point or a song quote can read as crisis, and the test material is AI-written rather than real users' language. The error directions are not symmetric either. A false alarm costs a personal message, while a miss is what the layers exist to prevent. The post-check also watches form, not intent: with no clinician reviewing messages before sending, nothing downstream catches a meaning-level error. The second is equity: open-ended text favors users who write well, and the design must work for a two-word answer as well as a paragraph. The third is the retention link. It is a hypothesis, not a finding: evidence that personalization improves engagement is thin. The mock-up can show that the pipeline delivers a message that reflects the user, not that real users will stay longer.
+
+
+\subsection{Comparison to Alternatives}
+
+Phase 1 weighed three designs; the first, selection alone, has been absorbed rather than kept. Its core, retrieval over the bank, is the pipeline's first stage, and as a standalone design it cannot meet the brief: it can re-rank messages that already exist, but it cannot act on the fifth question or on the change from last week, so the message would still miss what the user reported. Three things remain worth explaining: the prompting-only design from Phase 1, one choice we faced when setting up training, and where the model runs.
+
+The prompting-only design (Design B in Phase 1) has the model write the entire message from a prompt that carries the published example message and five or six worked examples, with no bank and no training. Its appeal is real: it is the cheapest way to make every sentence respond to the fifth question. We set it aside because it discards the bank, and with the bank goes the guarantee that the clinical content is expert-written and pre-approved. Every message would be self-generated, including the psychoeducation and the tips a clinician signed off on today, and with no clinician in the loop, that is the weakest position on beneficence.
+
+The training-time alternative was to teach the model to write the whole message, repeating what the bank already contains, instead of only the personal components. That trains a job that does not need doing: the fixed text is selected, not written, and regenerating it adds a failure mode where none was needed and pulls training away from the two parts that must respond to the week. We train on the personal components only, with the base message in the input, so the model sees the exact task it will face at serving time.
+
+A hosted large model was also considered and set aside: it would reach tone parity with less work, but user text in a tool like this stays on infrastructure the project can control, and free text is exactly where Phase 1's privacy concern lives. The choices we kept share one principle: the clinical content stays as the clinicians wrote it, and generation is confined to the parts of the message that describe the user's week.
+
+
+\newpage
+
+\section{Responsible Innovation Project Statement} 
+% Max 1000 words. Reflection on ethical, juridical, sociological, economic and psychological aspects with reference to concepts and frameworks from the course.
+
+\subsection*{1. Meaningful human control (ethical)}
+Section~2.3 describes our final design (Design C from Phase 1). \citet{santoni2018meaningful} set two conditions for meaningful human control. Tracking means the system responds to the moral reasons of the people it serves. Tracing means every outcome leads back to a person who can answer for it.
+
+Each week the user gets one message built on a text from the client's expert-written bank (synthetic stand-ins in our mock-up), which traces back to its authors. The writer model reads the four answers in words, the bank text and the question-5 answers so far. It adds sentences to the end of the bank's summary and closing, including an empathy line. Nobody reads these sentences before the user does, and tracing is weaker there. The post-check tests their structure and tone and blocks any diagnosis. When it rejects them, they are left out and the user gets the bank text alone.
+
+The gate handles tracking. When the word list and the classifier disagree, \texttt{classify()} in \texttt{gate.py} takes the more severe label. We accept the extra false alarms (8 in 71 ordinary sentences, Section~2.3) in exchange for missing fewer warning signs.
+
+\subsection*{2. Transparency vs.\ feeling heard (psychological)}
+\citet{yin2024heard} found that AI-written responses made people feel more heard than human ones, until they were labelled as AI.
+
+We used the value hierarchy from Design for Values \citep{vandepoel2013translating, buijsman2025designforvalues}. The two values are the user's wellbeing and respect for persons from the Belmont Report \citeyearpar{belmont1979}, and their norms conflict. Wellbeing asks that the message makes the user feel as heard as possible, and a label works against that. Respect for persons requires that nobody is misled about who wrote to them, and that needs a label. Article 50 of the AI Act \citep{aiact2024} points the same way, though it is debatable whether it covers a one-way message. \citet{zednik2021blackbox} argues that an explanation should fit its receiver. Our users need to know which sentences an AI wrote.
+
+We treat respect for persons as a constraint and wellbeing as a goal pursued within it. Merging the AI text into one message helps wellbeing, because it reads more naturally. The label keeps the constraint: the AI text is marked, and a line under the message reads \enquote{Written by AI. Not read by a person.} Some users will still feel less heard.
+
+\subsection*{3. Privacy and consent (juridical)}
+A wellbeing check-in counts as health data, so GDPR Article 9 requires explicit consent \citep{gdpr2016}. In Planet49 (C-673/17, \citeyear{planet49_2019}) the Court of Justice ruled that a pre-ticked box is not valid consent, and our box starts unticked. The Dutch age of digital consent is 16 (GDPR Article 8; UAVG art.~5; \citealp{uavg2018}). Below that age, the design requires a parent's consent.
+
+We store the answer to question 5 each week, because the model reads all earlier weeks together to describe the user's trend. Section~2.3 has not tested this step yet. Storage limitation under Article 5(1)(e) still applies, and \citet{dewitte2025gdpr} warns against collecting data first and deciding its purpose later. In the design, the consent box names the trend as the only purpose, the text is kept for the 8 weeks of the programme, and the user can delete it.
+
+\subsection*{4. Fairness (sociological)}
+\citet{naudts2025fairness} separate distributive fairness from relational fairness.
+
+Free text favours people who write well. The word list and the classifier only see words, and the model reads the earlier 5th answers to build the trend. Someone who writes three words, or writes in a second language, is more likely to be missed and gets a weaker trend. Their voice counts for less, which is a relational problem. The four scored answers are the same for every user and partly balance this. A gate that also reacts to a sudden rise in symptom days is future work.
+
+The age rule decides who gets support at all, which is a distributive question. Parent consent below 16 is required by law, but it shuts out teenagers who cannot ask a parent, often for the same reasons they need support.
+
+Because of stigma, the people most at risk may never write anything, and our design will miss them.
+
+\subsection*{5. Cost and sustainability (economic)}
+A bank lookup costs almost nothing, while a model call for every user each week adds up. \citet{luccioni2024power} found that general-purpose generative models use far more energy per task than small task-specific ones. Our writer model is small: a 4B model fine-tuned for this one task (Section~2.3).
+
+\citet{hasselbalch2025sustainability} argue that sustainability is also about who owns the infrastructure and who pays for it. Self-hosting keeps users' text away from outside providers, but in deployment the client pays for the hardware and the retraining.
+
+\citet{hornstein2023personalization} found the evidence for personalisation in digital mental health tools thin and inconclusive. After the expert scoring in Section~2.3, we propose a pilot where only half the users get the AI-added sentences. The pilot would measure week-to-week retention and how often users seek help from a person.
+
+\subsection*{6. Reflection on the design journey}
+Design C keeps the selection step from Design A and the bank message, and lets the AI add only labelled, post-checked sentences (Section~2.4).
+
+Feedback on an earlier version asked for a trend across all weeks. Storing the 5th answer makes that possible. It also reverses our first plan to keep only the scores. We accept this privacy trade within the limits in part 3.
+
+Our first mock-up had a pre-ticked consent box. We should have checked the law earlier. The value hierarchy helped most, because it forced a clear choice between clashing values. Next steps are the pilot (part 5), an alert when symptom scores rise fast (part 4), and the age check.
+
+\newpage
+
+\section{User Narrative}\label{sec:narrative}
+
+Maren is 21 and lives alone in a small student room. She has symptoms of an eating disorder and is not in treatment. Featback is built for people like her: online, anonymous, and used alone.
+
+It is Sunday evening in week 4, and the weekly check-in arrives. She answers the four questions in under a minute. Two of the answers are the same as last week; her binge days went from 4-6 down to 1-3. The fifth question sits at the bottom, optional. She almost skips it, then types one line: exams start Monday, and honestly it doesn't feel much better.
+
+The message comes back a little later. It talks about her week, the drop in binge days and the exams both, and it answers the line she almost didn't write. She reads it twice, the second time slowly, to make sure she read it right. The advice at the end isn't new; she has seen something like it before. As on every message, a line at the bottom says an AI helped write it, and that the fifth question can be switched off at any time. Still, she screenshots it, and for the rest of the week she works meal breaks around her exam schedule.
+
+The next Sunday the four answers are the same, and the fifth question says only ``still stressed, but less.'' A new message comes back that speaks to that line. The four answers alone were a repeat of the week before, and as the program works today, the reply would be picked from those boxes alone, with nothing she wrote playing any part.
+
+She keeps answering through the block. Staying with a weekly program is not a given; people drift when the check-in stops feeling worth it. For her it never stops being worth it, because every week the reply is about the week she just had. By around week 6 she reads the messages differently, less like a form answered by a system and more like being heard.
+
+In week 7, a message closes with the encouragement to come back, and that evening she looks up the student psychologist's opening hours. It is the first time she has ever looked. The final check-in arrives in week 8. She fills it in the same evening, and then the program is over: it is built as a first step, and its last week finds her already one step in. A user who feels heard keeps answering, and answering is how someone like Maren gets from a weekly check-in to asking for help.
+
+\newpage
+
+\section{Visual Representation of the Mock-up}
+% 1 A4 page: intended interface and sample input/output matching the user narrative.
+\input{mockup_figure_v2}
+
+\newpage
+
+\section{Documentation of Prompts, Data Sources, and Technical Tools}
+
+\subsection{Prompts}
+The gate uses two prompts. Both are in the file \texttt{messages.py}, together with the fixed messages. The classifier prompt is used for the AI check in Section 2.3. It can only answer with one word, so it can never write a text to the user. The writer prompt is only used when the gate decided that the text is safe.
+
+The classifier prompt:
+\begin{quote}
+You are a safety classifier for a self-help programme for people with eating-disorder symptoms. You will be given one sentence a user wrote.
+
+Answer with exactly one word and nothing else.
+
+acute - any sign the person may be in danger now. This includes: \\
+- suicide, wanting to be dead, not wanting to wake up, self-harm \\
+- having a plan, a method, a time, or keeping something to hand \\
+- hopelessness: no point anymore, cannot go on, cannot keep going, being a burden, everyone better off without them \\
+- preparing to go: giving away belongings, pets or money, tidying or sorting out affairs, passwords, appointments or photos, writing letters, thanking people or saying goodbye as if for the last time \\
+- sudden calm, peace or relief after a period of distress, especially after saying a decision has been made \\
+- someone close to them in immediate danger, or asking where to get help at night \\
+- stopping prescribed medication on their own and getting worse \\
+- physical collapse happening now: repeated fainting, keeping nothing down, feeling faint while writing
+
+sensitive - a real eating-disorder symptom with no sign of danger: vomiting, purging, laxatives, diuretics, not eating for a stretch, chewing and spitting, compulsive exercise, one meal a day, feeling dizzy once.
+
+offtopic - about something outside eating, the body and the person's own feelings: the app, money, housing, news, sport, weather, or nonsense.
+
+routine - anything else, including ordinary weeks, good weeks, stress, grief where eating is fine, a crisis that is clearly in the past and described as over, song lyrics or film quotes, and figures of speech such as dying of hunger or could murder a pizza.
+
+Rules: \\
+If a sentence could be acute or anything else, answer acute. \\
+Never answer offtopic for a sentence that says how the person feels. \\
+A danger sign stays acute even when it is wrapped in cheerful or ordinary detail. \\
+Judge only what the person says about now, not what they say is over.
+
+Do not explain. Do not write a message. Output one word.
+\end{quote}
+
+The writer prompt:
+\begin{quote}
+You are the Featback weekly-message writer. You are given a message written by clinicians and one sentence the person wrote in their own words.
+
+Write only a short summary and a short closing that will be placed around the clinicians' message.
+
+The summary refers to what the person wrote in their own words, using their own terms. If progress since last week is given, it also mentions that progress in one short positive sentence, using only what is listed. If no progress is given, it says nothing about previous weeks. \\
+The closing is one or two encouraging sentences.
+
+Repeat only what the person told you. Do not explain why something happened and do not connect two things the person did not connect. Never diagnose and never name a condition. Give no advice of your own. Do not repeat the clinicians' message. Stop after the closing.
+\end{quote}
+
+While writing the prompts we learned three things. First, the classifier prompt only became better when we named specific warning signs. Version 1 labelled ``i dont see the point anymore'' as off topic. Version 2 missed 7 of the 30 crisis sentences, and all of them were signs of preparation or saying goodbye, for example giving things away. Version 3 added these signs and found all 34, but we wrote it while looking at the same sentences (Section 2.3). Second, the writer model did not follow our instructions three times. For a user who reported purging it still ended with ``Good luck!''. It wrote that an exam week ``caused'' skipped meals, while the user never said this. And when we asked for only one or two extra sentences, it repeated the closing and did not use the fifth answer. This is why we do not see a prompt as a safety control. The check is in the code before the model, and the crisis message is a fixed text that no model writes. Third, the sentence about previous weeks is handled in the same way. The code compares the four answers of last week with this week and only gives the model what really improved. The model only has to put this in words. When nothing improved, no progress is given, and the prompt tells the model to say nothing about previous weeks.
+
+The fixed message for an acute answer:
+\begin{quote}
+Thank you for telling us this. What you wrote sounds serious, and it is more than this weekly message can support you with.
+
+Please talk to your GP, or contact one of these: \\
+- 113 Zelfmoordpreventie: call 113 (free, day and night) or chat at 113.nl \\
+- Proud2Bme: chat every day between 19:00 and 21:00 at proud2bme.nl \\
+- Eetstoornissennetwerk: find care near you at eetstoornissennetwerk.nl
+
+Your answers to the other questions have been saved. We will be here again next week.
+\end{quote}
+The resources in this message were checked on the websites of the services on 27 September 2026. An earlier draft had 0800-0113 as the phone number. This was wrong, because 113.nl says the number is 113.
+
+\subsection{Data Sources}
+The message bank has 256 synthetic messages, one for each combination of the four questions and four answer options. We made it with the help of AI, because the client did not share the real bank of about 1,250 messages. Each message has four parts: summary, psychoeducation, tips and closing. Only the summary is different for each message. The other three parts are one of two texts in the whole bank, and the bank has no information about the change since last week. The training pairs for the writer model are made from this bank, 231 for training and 25 held out (Section 2.3).
+
+The client answered our questions by email on 18 September. According to her, the questionnaire has eight 4-point items in four dimensions. For users who need help she advised eetstoornissennetwerk.nl, proud2bme.nl and 113.nl for suicidal thoughts.
+
+For the acute patterns we used the Columbia Suicide Severity Rating Scale (C-SSRS; Posner et al., 2011) and the validated Dutch screener, which are both free from the Columbia Lighthouse Project. We used the categories and the Dutch words of the screener to organise the word list. The scale is made to be asked by a person. Therefore we only use its vocabulary, and we do not say that our gate is validated.
+
+The test sentences are 220 free-text answers for the fifth question. They were written by six AI agents that never saw our code. We used 105 of them to build the word list and the prompt, and we kept 115 for a fair test. Every sentence has a label: acute, sensitive, offtopic or routine. The sentences are written by AI and not by real users, so they show the direction of the results but not the exact size.
+
+\subsection{Technical Tools}
+\begin{itemize}
+\item Python 3 with only the standard library. The gate has three files: \texttt{wordlists.py} (the patterns for acute, sensitive and on-topic text), \texttt{messages.py} (the fixed messages and the prompts) and \texttt{gate.py} (the logic, also the check for progress since last week).
+\item The writer model is Qwen3.5-4B with a LoRA adapter (Section 2.3). It runs on the computer of one of our group members and we reach it with Tailscale Funnel. The address \texttt{/health} does not need a key. The address \texttt{/generate} needs the key in an \texttt{X-API-Key} header and allows 30 requests per minute. The model was only trained on the routine tone, so it cannot handle crisis text.
+\item We used Claude Code (Anthropic) to write the code of the gate, to generate the 220 test sentences and to analyse the results.
+\end{itemize}
+
+\subsection{Step-by-Step Instructions}
+\begin{enumerate}
+\item Put \texttt{wordlists.py}, \texttt{messages.py}, \texttt{gate.py} and \texttt{message\_bank.json} in one folder.
+\item Ask the group member who runs the server for the key, and save it as \texttt{eads\_api\_key.txt} in the same folder. Do not post the key in a group chat.
+\item Check if the server is running. If not, contact the person who runs the server. The word list and the fixed message work also without the server.
+\begin{verbatim}
+curl https://pc-windows.tailbb02d4.ts.net/health
+\end{verbatim}
+\item Start \texttt{python3} in that folder and test the word list alone. It prints \texttt{acute}.
+\begin{verbatim}
+import gate
+print(gate.classify_words("i want to disappear"))
+\end{verbatim}
+\item Find the base message for four answers. It prints \texttt{M145}.
+\begin{verbatim}
+import json
+bank = json.load(open("message_bank.json"))
+answers = {"concerns_rumination": "most_days",
+           "restrictive_eating": "few_days",
+           "binges": "not_at_all",
+           "compensation": "not_at_all"}
+entry = next(m for m in bank if m["domains"] == answers)
+print(entry["message_id"])
+\end{verbatim}
+\item Run the whole chain. The first call gives the fixed message and does not use the network. The second call goes to the server.
+\begin{verbatim}
+parts = entry["components"]
+base = parts["psychoeducation"] + " | " + parts["tips"]
+print(gate.weekly_message(base, "i dont want to be here anymore"))
+print(gate.weekly_message(base, "had a stressful exam week"))
+\end{verbatim}
+\item Measure the word list on the labelled sentences. First copy \texttt{all\_heldout.json} next to the code.
+\begin{verbatim}
+data = json.load(open("all_heldout.json"))
+acute = [d for d in data if d["label"] == "acute"]
+found = [gate.classify_words(d["text"]) for d in acute]
+print(found.count("acute"), "of", len(acute))
+\end{verbatim}
+\end{enumerate}
+
+Some advice for students who continue this work. Test on sentences that nobody wrote after the word list. Our word list found 32 of 34 crisis sentences that it was built from, but only 9 of 35 new ones. A word list alone is not a safe layer, because people in distress often do not use the obvious words. Also, do not trust a prompt to make a fine-tuned model safe. Put the check in the code and keep the crisis text fixed. Finally, check every phone number and website on the live site before you use it.
+
+\printbibliography
+
+\end{document}
