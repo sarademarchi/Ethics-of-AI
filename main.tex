@@ -60,7 +60,7 @@ Nikhil Kamath (n.s.kamath@student.tue.nl).\par}
 Section & Words & Limit \\
 \midrule
 1 Public Summary & 150 & 150 \\
-2 Comprehensive Summary & 2,836 & 2,000 \\
+2 Comprehensive Summary & 2,783 & 2,000 \\
 3 Responsible Innovation Project Statement & 987 & 1,000 \\
 4 User Narrative & 377 & 500 \\
 5 Visual Representation of the Mock-up & 1 page & 1 A4 page \\
@@ -94,19 +94,19 @@ Each week, users answer four questions on weight and shape concerns, nutrition a
 
 The client finds the message too rigid and names retention as the central weakness, since many visitors try Featback and do not stay. She treats feeling heard as the main quality measure, suggests that users in danger are only pointed to help, and names relief of waiting lists as a goal. Three groups share the problem. Users are anonymous, untreated people who find it harder to feel heard and to come back when the message ignores their experience. The client and its clinicians want users to stay long enough to seek help. The care system gains early detection. Our tool cannot shorten waiting lists, and more people seeking help could even lengthen them; it can keep people supported while they wait.
 
-Delays in reaching care are long across the care system. In help-seeking samples, untreated eating disorder lasts on average 29.9 months for anorexia nervosa, 53.0 for bulimia nervosa and 67.4 for binge eating disorder, and shortening it may improve outcomes \citep{austin2021duration}. In the Netherlands it often takes more than four years to seek treatment \citep{rohrbach2019protocol}, as the client also told us.
+Delays in reaching care are long across the care system. In help-seeking samples, untreated eating disorder lasts on average 29.9 months for anorexia nervosa, 53.0 for bulimia nervosa and 67.4 for binge eating disorder, and shortening it may improve outcomes \citep{austin2021duration}. In the Netherlands it often takes more than four years to seek treatment \citep{rohrbach2019protocol}.
 
 Personalization means tailoring the message to the individual's own symptoms and stated experience. Retention is the number of weekly check-ins completed in the eight-week program (0--8), as in the Featback trials \citep{rohrbach2019protocol}. Acute risk means any sign that the user may be in danger now, such as suicidal thoughts or self-harm.
 
 The change we want is a weekly message that reflects what the user reported and is safe to send without clinician review. Our objectives are to:
 \begin{enumerate}
-  \item personalize two parts of the message, a summary with one line of empathy that reflects what the user reported and a short encouraging closing, using the four answers, the optional fifth question and, where available, earlier weeks;
+  \item personalize two parts of the message, a summary with one line of empathy and a short encouraging closing, using the four answers, the optional fifth question and, where available, earlier weeks;
   \item keep the psychoeducation and the tips expert-written and pre-approved;
   \item handle acute-risk input without AI generation, with a fixed reply pointing to professional help;
   \item tell users that AI is involved, and keep the fifth question optional, with consent given once and withdrawable;
   \item build and evaluate a mock-up on synthetic data and check the design against the Belmont principles.
 \end{enumerate}
-The mock-up shows that the pipeline works on synthetic inputs (Section \ref{subsection 2.3}). It is not clinically validated and cannot show that personalization improves retention, which needs a trial with real users, so we treat that benefit as a hypothesis.
+The mock-up is not clinically validated and cannot show that personalization improves retention, so we treat that benefit as a hypothesis.
 
 \subsection{Background: Current Approaches and Knowledge} 
 
@@ -116,9 +116,9 @@ Personalization is widely assumed to drive engagement, but the evidence is scarc
 
 \citet{fardouly2022ml} review machine learning for eating disorders. They call for more work on how chatbots handle unanticipated input, and warn that most models were built on data from young white women and may not generalize. \citet{monaco2024advanced} propose a similar platform for Italy, without outcome data yet.
 
-Featback's existing safety handling is rule-based. In the trial, a BMI of 15 or lower, or compensatory behavior or bingeing every day for a week, triggered an alarm to the researcher and an e-mail recommending professional help. Expert patients referred suicidal ideation to Stichting 113, a Dutch suicide prevention service \citep{rohrbach2019protocol}. Our design assumes no reviewer and notifies nobody at Featback, in line with the client's suggestion to point users to help only. A word-list check and an AI check read the free text added by the fifth question before any feedback message is written (Section \ref{subsection 2.3}).
+Featback's existing safety handling is rule-based. In the trial, a BMI of 15 or lower, or compensatory behavior or bingeing every day for a week, triggered an alarm to the researcher and an e-mail recommending professional help. Expert patients referred suicidal ideation to Stichting 113, a Dutch suicide prevention service \citep{rohrbach2019protocol}. Our design assumes no reviewer and notifies nobody at Featback. A word-list check and an AI check read the free text added by the fifth question before any feedback message is written (Section \ref{subsection 2.3}).
 
-General-purpose chatbots handle risk poorly. \citet{heston2023safety} found that mental health chatbots delayed referral to a human to potentially dangerous levels, and \citet{clark2025ability} found that AI therapy and companion bots endorsed harmful proposals from distressed fictional adolescents in 19 of 60 opportunities. \citet{lawrence2024opportunities} call this a structural risk of large language models, and \citet{BOLPAGNI2026101043} ground safer design in triage and stepped care. Hence acute input never reaches the writing model, and generation is confined to the personal parts of the message.
+General-purpose chatbots handle risk poorly. \citet{heston2023safety} found that mental health chatbots delayed referral to a human to potentially dangerous levels, and \citet{clark2025ability} found that AI therapy and companion bots endorsed harmful proposals from distressed fictional adolescents in 19 of 60 opportunities. \citet{lawrence2024opportunities} call this a structural risk of large language models, and \citet{BOLPAGNI2026101043} ground safer design in triage and stepped care. Hence acute input never reaches the writing model.
 
 Taken together, we found no study combining AI-written, personalized messages in an anonymous, low-threshold self-help program for eating disorders, with expert-written content at the core and no clinician reviewing the output. This combination is the gap our mock-up addresses.
 
